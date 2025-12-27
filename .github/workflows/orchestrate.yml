@@ -1,0 +1,14 @@
+name: Orchestrate Builds
+
+on:
+  workflow_dispatch:
+
+jobs:
+  trigger-repoA:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Trigger repoA build
+      run: |
+        gh workflow run build.yml --repo amisovic/repoA --field orchestrator_runid=${{ github.run_id }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_WORKFLOWS }}
