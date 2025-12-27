@@ -7,8 +7,27 @@ jobs:
   trigger-repoA:
     runs-on: ubuntu-latest
     steps:
-    - name: Trigger repoA build
+    - name: Trigger repoA build and wait
       run: |
-        gh workflow run build.yml --repo amisovic/repoA --field orchestrator_runid=${{ github.run_id }}
+        echo "Triggering repoA build..."
+        run_id=$(gh workflow run build.yml --repo amisovic/repoA --field orchestrator_runid=${{ github.run_id }} --json id -q .id)
+        echo "Triggered run ID: $run_id"
+        
+        echo "Waiting for repoA build to complete..."
+        while true; do
+          status=$(gh run view $run_id --repo amisovic/repoA --json status -q .status)
+          conclusion=$(gh run view $run_id --repo amisovic/repoA --json conclusion -q .conclusion)
+          echo "Current status: $status, conclusion: $conclusion"
+          if [ "$status" = "completed" ]; then
+            if [ "$conclusion" = "success" ]; then
+              echo "repoA build succeeded!"
+            else
+              echo "repoA build failed with conclusion: $conclusion"
+              exit 1
+            fi
+            break
+          fi
+          sleep 10
+        done
       env:
         GITHUB_TOKEN: ${{ secrets.PAT_WORKFLOWS }}
