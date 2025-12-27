@@ -5,48 +5,10 @@ on:
 
 jobs:
   trigger-repoA:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Trigger repoA build and wait
-      run: |
-        echo "Triggering repoA build..."
-        gh workflow run build.yml --repo amisovic/repoA --field orchestrator_runid=${{ github.run_id }}
-        echo "Workflow dispatch sent."
-        
-        # Poll for run ID with timeout
-        timeout=60
-        elapsed=0
-        while [ $elapsed -lt $timeout ]; do
-          run_id=$(gh run list --repo amisovic/repoA --workflow build.yml --json databaseId,name --jq ".[] | select(.name | test(\".*${{ github.run_id }}\")) | .databaseId")
-          if [ -n "$run_id" ]; then
-            echo "Found run ID: $run_id"
-            break
-          fi
-          echo "Run not found yet, waiting..."
-          sleep 5
-          elapsed=$((elapsed + 5))
-        done
-        
-        if [ -z "$run_id" ]; then
-          echo "Timeout waiting for run to start"
-          exit 1
-        fi
-        
-        echo "Waiting for repoA build to complete..."
-        while true; do
-          status=$(gh run view $run_id --repo amisovic/repoA --json status -q .status)
-          conclusion=$(gh run view $run_id --repo amisovic/repoA --json conclusion -q .conclusion)
-          echo "Current status: $status, conclusion: $conclusion"
-          if [ "$status" = "completed" ]; then
-            if [ "$conclusion" = "success" ]; then
-              echo "repoA build succeeded!"
-            else
-              echo "repoA build failed with conclusion: $conclusion"
-              exit 1
-            fi
-            break
-          fi
-          sleep 10
-        done
-      env:
-        GITHUB_TOKEN: ${{ secrets.PAT_WORKFLOWS }}
+    uses: ./.github/workflows/trigger-and-wait.yml
+    with:
+      repo: 'amisovic/repoA'
+      workflow: 'build.yml'
+      run_id: ${{ github.run_id }}
+    secrets:
+      token: ${{ secrets.PAT_WORKFLOWS }}
