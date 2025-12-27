@@ -4,11 +4,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  trigger-repoA:
+  repoA-build:
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
       repo: 'amisovic/repoA'
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
+      run_timeout_seconds: 600
+    secrets:
+      token: ${{ secrets.PAT_WORKFLOWS }}
+  repoB-build:
+    needs: repoA-build
+    uses: ./.github/workflows/trigger-and-wait.yml
+    with:
+      repo: 'amisovic/repoB'
+      workflow: 'build.yml'
+      run_id: ${{ github.run_id }}
+      run_timeout_seconds: 300
+    secrets:
+      token: ${{ secrets.PAT_WORKFLOWS }}
+  repoC-build:
+    needs: repoB-build
+    uses: ./.github/workflows/trigger-and-wait.yml
+    with:
+      repo: 'amisovic/repoC'
+      workflow: 'build.yml'
+      run_id: ${{ github.run_id }}
+      run_timeout_seconds: 10
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
