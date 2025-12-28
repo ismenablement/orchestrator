@@ -1,5 +1,7 @@
 name: Orchestrate Builds
 
+run-name: ${{ format('Orchestrate Builds - {0}', github.run_id) }}
+
 on:
   workflow_dispatch:
 
