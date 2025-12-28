@@ -16,6 +16,10 @@ on:
         required: false
         type: number
         default: 600
+      branch:
+        required: false
+        type: string
+        default: 'main'
     secrets:
       token:
         required: true
@@ -27,7 +31,7 @@ jobs:
     - name: Trigger workflow and wait
       run: |
         echo "Triggering ${{ inputs.workflow }} on ${{ inputs.repo }}..."
-        gh workflow run ${{ inputs.workflow }} --repo ${{ inputs.repo }} --field orchestrator_runid=${{ inputs.run_id }}
+        gh workflow run ${{ inputs.workflow }} --repo ${{ inputs.repo }} --ref ${{ inputs.branch }} --field orchestrator_runid=${{ inputs.run_id }}
         echo "Workflow dispatch sent."
         
         # Poll for run ID with timeout

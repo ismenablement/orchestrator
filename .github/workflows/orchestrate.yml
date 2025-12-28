@@ -13,6 +13,7 @@ jobs:
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
       run_timeout_seconds: 600
+      branch: ${{ github.ref_name }}
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
   repoB-build:
@@ -23,6 +24,7 @@ jobs:
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
       run_timeout_seconds: 600
+      branch: ${{ github.ref_name }}
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
   repoC-build:
@@ -33,6 +35,7 @@ jobs:
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
       run_timeout_seconds: 300
+      branch: ${{ github.ref_name }}
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
   repoD-build:
@@ -43,6 +46,7 @@ jobs:
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
       run_timeout_seconds: 600
+      branch: ${{ github.ref_name }}
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
   repoE-build:
@@ -53,5 +57,6 @@ jobs:
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
       run_timeout_seconds: 600
+      branch: ${{ github.ref_name }}
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
