@@ -10,10 +10,10 @@ jobs:
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
       repo: 'amisovic/repoA'
+      branch: ${{ github.ref_name }}
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
       run_timeout_seconds: 600
-      branch: ${{ github.ref_name }}
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
   repoB-build:
@@ -21,10 +21,10 @@ jobs:
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
       repo: 'amisovic/repoB'
+      branch: ${{ github.ref_name }}
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
       run_timeout_seconds: 600
-      branch: ${{ github.ref_name }}
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
   repoC-build:
@@ -32,10 +32,10 @@ jobs:
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
       repo: 'amisovic/repoC'
+      branch: ${{ github.ref_name }}
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
       run_timeout_seconds: 300
-      branch: ${{ github.ref_name }}
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
   repoD-build:
@@ -43,10 +43,10 @@ jobs:
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
       repo: 'amisovic/repoD'
+      branch: ${{ github.ref_name }}
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
       run_timeout_seconds: 600
-      branch: ${{ github.ref_name }}
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
   repoE-build:
@@ -54,9 +54,9 @@ jobs:
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
       repo: 'amisovic/repoE'
+      branch: ${{ github.ref_name }}
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
       run_timeout_seconds: 600
-      branch: ${{ github.ref_name }}
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
