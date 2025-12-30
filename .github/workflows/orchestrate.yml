@@ -60,3 +60,26 @@ jobs:
       run_timeout_seconds: 600
     secrets:
       token: ${{ secrets.PAT_WORKFLOWS }}
+  post-statuses:
+    needs: [repoA-build, repoB-build, repoC-build, repoD-build, repoE-build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Post success statuses to PRs
+      run: |
+        repos=("amisovic/repoA" "amisovic/repoB" "amisovic/repoC" "amisovic/repoD" "amisovic/repoE")
+        branch="${{ github.ref_name }}"
+        for repo in "${repos[@]}"; do
+          echo "Checking PR for $repo on branch $branch"
+          pr_number=$(gh pr list --repo $repo --head $branch --base main --json number -q '.[0].number')
+          echo "PR number: $pr_number"
+          if [ -n "$pr_number" ]; then
+            head_sha=$(gh pr view $pr_number --repo $repo --json headRefOid -q '.headRefOid')
+            echo "Head SHA: $head_sha"
+            gh api -X POST /repos/$repo/statuses/$head_sha -f state=success -f context=orchestrator-build -f description="All builds passed"
+            echo "Posted status for $repo"
+          else
+            echo "No PR found for $repo"
+          fi
+        done
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_WORKFLOWS }}
