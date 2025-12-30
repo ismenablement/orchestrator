@@ -9,7 +9,7 @@ on:
 
 jobs:
   invalidate-prs:
-    if: github.event_name == 'repository_dispatch' && github.event.action == 'invalidate'
+    if: github.event_name == 'repository_dispatch' && github.event.client_payload.action == 'invalidate'
     runs-on: ubuntu-latest
     steps:
     - name: Post failure statuses to invalidate PRs
