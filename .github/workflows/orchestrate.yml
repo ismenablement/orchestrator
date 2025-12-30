@@ -4,8 +4,33 @@ run-name: ${{ format('Orchestrate Builds - {0}', github.run_id) }}
 
 on:
   workflow_dispatch:
+  repository_dispatch:
+    types: [invalidate]
 
 jobs:
+  invalidate-prs:
+    if: github.event_name == 'repository_dispatch' && github.event.action == 'invalidate'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Post failure statuses to invalidate PRs
+      run: |
+        repos=("amisovic/repoA" "amisovic/repoB" "amisovic/repoC" "amisovic/repoD" "amisovic/repoE")
+        branch="${{ github.ref_name }}"
+        for repo in "${repos[@]}"; do
+          echo "Checking PR for $repo on branch $branch"
+          pr_number=$(gh pr list --repo $repo --head $branch --base main --json number -q '.[0].number')
+          echo "PR number: $pr_number"
+          if [ -n "$pr_number" ]; then
+            head_sha=$(gh pr view $pr_number --repo $repo --json headRefOid -q '.headRefOid')
+            echo "Head SHA: $head_sha"
+            gh api -X POST /repos/$repo/statuses/$head_sha -f state=failure -f context=orchestrator-build -f description="New PR created, re-run orchestrator"
+            echo "Posted invalidate for $repo"
+          else
+            echo "No PR found for $repo"
+          fi
+        done
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_WORKFLOWS }}
   repoA-build:
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
@@ -77,6 +102,29 @@ jobs:
             echo "Head SHA: $head_sha"
             gh api -X POST /repos/$repo/statuses/$head_sha -f state=success -f context=orchestrator-build -f description="All builds passed"
             echo "Posted status for $repo"
+          else
+            echo "No PR found for $repo"
+          fi
+        done
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_WORKFLOWS }}
+  post-failure-statuses:
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Post failure statuses to PRs
+      run: |
+        repos=("amisovic/repoA" "amisovic/repoB" "amisovic/repoC" "amisovic/repoD" "amisovic/repoE")
+        branch="${{ github.ref_name }}"
+        for repo in "${repos[@]}"; do
+          echo "Checking PR for $repo on branch $branch"
+          pr_number=$(gh pr list --repo $repo --head $branch --base main --json number -q '.[0].number')
+          echo "PR number: $pr_number"
+          if [ -n "$pr_number" ]; then
+            head_sha=$(gh pr view $pr_number --repo $repo --json headRefOid -q '.headRefOid')
+            echo "Head SHA: $head_sha"
+            gh api -X POST /repos/$repo/statuses/$head_sha -f state=failure -f context=orchestrator-build -f description="One or more builds failed"
+            echo "Posted failure for $repo"
           else
             echo "No PR found for $repo"
           fi
