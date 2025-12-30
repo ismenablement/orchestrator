@@ -15,21 +15,18 @@ jobs:
     - name: Post failure statuses to invalidate PRs
       run: |
         repos=("amisovic/repoA" "amisovic/repoB" "amisovic/repoC" "amisovic/repoD" "amisovic/repoE")
+        branch="${{ github.event.client_payload.branch }}"
+        echo "Invalidating PRs for branch: $branch"
         for repo in "${repos[@]}"; do
-          echo "Checking PRs for $repo"
-          prs=$(gh pr list --repo $repo --base main --state open --json number,headRefOid)
-          echo "PRs: $prs"
-          if [ "$prs" != "[]" ]; then
-            echo "$prs" | jq -r '.[] | @base64' | while read pr_encoded; do
-              pr=$(echo $pr_encoded | base64 --decode)
-              pr_number=$(echo $pr | jq -r '.number')
-              head_sha=$(echo $pr | jq -r '.headRefOid')
-              echo "Invalidating PR #$pr_number with SHA $head_sha for $repo"
-              gh api -X POST /repos/$repo/statuses/$head_sha -f state=failure -f context=orchestrator-build -f description="PR changed, re-run orchestrator"
-              echo "Posted invalidate for $repo PR #$pr_number"
-            done
+          echo "Checking PR for $repo on branch $branch"
+          pr_number=$(gh pr list --repo $repo --head $branch --base main --json number -q '.[0].number')
+          if [ -n "$pr_number" ]; then
+            head_sha=$(gh pr view $pr_number --repo $repo --json headRefOid -q '.headRefOid')
+            echo "Invalidating PR #$pr_number with SHA $head_sha for $repo"
+            gh api -X POST /repos/$repo/statuses/$head_sha -f state=failure -f context=orchestrator-build -f description="PR changed, re-run orchestrator"
+            echo "Posted invalidate for $repo PR #$pr_number"
           else
-            echo "No open PRs for $repo"
+            echo "No PR found for $repo on branch $branch"
           fi
         done
       env:
