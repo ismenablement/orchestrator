@@ -28,7 +28,18 @@ jobs:
   trigger-and-wait:
     runs-on: ubuntu-latest
     steps:
+    - name: Check branch existence
+      id: check
+      run: |
+        if gh api repos/${{ inputs.repo }}/branches/${{ inputs.branch }} --silent 2>/dev/null; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.token }}
     - name: Trigger workflow and wait
+      if: steps.check.outputs.exists == 'true'
       run: |
         echo "Triggering ${{ inputs.workflow }} on ${{ inputs.repo }}..."
         gh workflow run ${{ inputs.workflow }} --repo ${{ inputs.repo }} --ref ${{ inputs.branch }} --field orchestrator_runid=${{ inputs.run_id }}
