@@ -64,19 +64,17 @@ jobs:
     needs: [repoA-build, repoB-build, repoC-build, repoD-build, repoE-build]
     runs-on: ubuntu-latest
     steps:
-    - name: Post success statuses to PRs
+    - name: Dispatch success to repos
       run: |
         repos=("amisovic/repoA" "amisovic/repoB" "amisovic/repoC" "amisovic/repoD" "amisovic/repoE")
         branch="${{ github.ref_name }}"
         for repo in "${repos[@]}"; do
-          echo "Checking PR for $repo on branch $branch"
+          echo "Dispatching to $repo"
           pr_number=$(gh pr list --repo $repo --head $branch --base main --json number -q '.[0].number')
-          echo "PR number: $pr_number"
           if [ -n "$pr_number" ]; then
             head_sha=$(gh pr view $pr_number --repo $repo --json headRefOid -q '.headRefOid')
-            echo "Head SHA: $head_sha"
-            gh api -X POST /repos/$repo/statuses/$head_sha -f state=success -f context=orchestrator-build -f description="All builds passed"
-            echo "Posted status for $repo"
+            gh api /repos/$repo/dispatches -f event_type=orchestrate-success -f client_payload[head_sha]=$head_sha
+            echo "Dispatched to $repo"
           else
             echo "No PR found for $repo"
           fi
