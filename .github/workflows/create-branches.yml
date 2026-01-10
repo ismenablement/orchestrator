@@ -12,13 +12,20 @@ jobs:
   create-branches:
     runs-on: ubuntu-latest
     steps:
+    - name: Update gh CLI
+      run: |
+        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+        sudo apt update
+        sudo apt install --only-upgrade gh
+        gh --version
     - name: Create branches in all repos
       run: |
         repo="ismeneablement/repoA"
         branch="${{ inputs.branch_name }}"
         echo "Creating branch $branch in $repo"
-        main_sha=$(curl -s -H "Authorization: token ${{ secrets.TOKEN }}" https://api.github.com/repos/$repo/git/refs/heads/main | jq -r .object.sha)
+        main_sha=$(gh api repos/$repo/git/refs/heads/main -q .object.sha)
         echo "Main SHA for $repo: $main_sha"
-        curl -X POST -H "Authorization: token ${{ secrets.TOKEN }}" -H "Content-Type: application/json" -d "{\"ref\": \"refs/heads/$branch\", \"sha\": \"$main_sha\"}" https://api.github.com/repos/$repo/git/refs
+        gh api repos/$repo/git/refs -f ref=refs/heads/$branch -f sha=$main_sha
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
