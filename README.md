@@ -74,7 +74,7 @@ NOTE: Adding "exit 1" status in any of the repos build.yml can "simulate" failur
    
    **Example Command**:
    ```bash
-   cd /Users/e1083457/Repos/orchestrator && gh workflow run test-post-statuses.yml --ref main -f branch=DPTA-1122 -f repo=amisovic/repoB
+   cd /Users/e1083457/Repos/orchestrator && gh workflow run test-post-statuses.yml --ref main -f branch=DPTA-1122 -f repo=ismeneablement/repoB
    ```
 
 ---

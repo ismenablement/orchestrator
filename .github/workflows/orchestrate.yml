@@ -14,7 +14,7 @@ jobs:
   repoA-build:
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
-      repo: 'amisovic/repoA'
+      repo: 'ismeneablement/repoA'
       branch: ${{ inputs.branch }}
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
@@ -25,7 +25,7 @@ jobs:
     needs: repoA-build
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
-      repo: 'amisovic/repoB'
+      repo: 'ismeneablement/repoB'
       branch: ${{ inputs.branch }}
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
@@ -36,7 +36,7 @@ jobs:
     needs: repoA-build
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
-      repo: 'amisovic/repoC'
+      repo: 'ismeneablement/repoC'
       branch: ${{ inputs.branch }}
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
@@ -47,7 +47,7 @@ jobs:
     needs: repoA-build
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
-      repo: 'amisovic/repoD'
+      repo: 'ismeneablement/repoD'
       branch: ${{ inputs.branch }}
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
@@ -58,7 +58,7 @@ jobs:
     needs: [repoB-build, repoC-build, repoD-build]
     uses: ./.github/workflows/trigger-and-wait.yml
     with:
-      repo: 'amisovic/repoE'
+      repo: 'ismeneablement/repoE'
       branch: ${{ inputs.branch }}
       workflow: 'build.yml'
       run_id: ${{ github.run_id }}
@@ -71,7 +71,7 @@ jobs:
     steps:
     - name: Dispatch success to repos
       run: |
-        repos=("amisovic/repoA" "amisovic/repoB" "amisovic/repoC" "amisovic/repoD" "amisovic/repoE")
+        repos=("ismeneablement/repoA" "ismeneablement/repoB" "ismeneablement/repoC" "ismeneablement/repoD" "ismeneablement/repoE")
         branch="${{ inputs.branch }}"
         for repo in "${repos[@]}"; do
           echo "Dispatching to $repo"

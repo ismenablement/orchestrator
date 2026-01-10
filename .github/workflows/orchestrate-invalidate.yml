@@ -14,7 +14,7 @@ jobs:
     steps:
     - name: Post failure statuses to invalidate PRs
       run: |
-        repos=("amisovic/repoA" "amisovic/repoB" "amisovic/repoC" "amisovic/repoD" "amisovic/repoE")
+        repos=("ismeneablement/repoA" "ismeneablement/repoB" "ismeneablement/repoC" "ismeneablement/repoD" "ismeneablement/repoE")
         branch="${{ github.event.client_payload.branch }}"
         echo "Invalidating PRs for branch: $branch"
         for repo in "${repos[@]}"; do
