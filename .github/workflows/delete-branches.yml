@@ -1,0 +1,31 @@
+name: Delete Branches
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Name of the branch to delete'
+        required: true
+        type: string
+
+jobs:
+  delete-branches:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Delete branches in all repos
+      run: |
+        repos=("ismenablement/repoA" "ismenablement/repoB" "ismenablement/repoC" "ismenablement/repoD" "ismenablement/repoE")
+        branch="${{ inputs.branch_name }}"
+        for repo in "${repos[@]}"; do
+          echo "Checking branch $branch in $repo"
+          if gh api repos/$repo/branches/$branch --silent 2>/dev/null; then
+            echo "Branch exists, deleting..."
+            gh api repos/$repo/git/refs/heads/$branch -X DELETE
+            echo "Deleted branch $branch in $repo"
+          else
+            echo "Branch $branch does not exist in $repo"
+          fi
+          echo "---"
+        done
+      env:
+        GH_TOKEN: ${{ secrets.TOKEN }}
