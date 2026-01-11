@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       repo:
-        description: 'Repo to dispatch to (e.g., ismeneablement/repoA)'
+        description: 'Repo to dispatch to (e.g., ismenablement/repoA)'
         required: true
         type: string
 
