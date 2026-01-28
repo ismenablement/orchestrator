@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Simulate error handling
+      continue-on-error: true
       run: |
         error_count=${{ inputs.error_value }}
         echo "Simulated error count: $error_count"
