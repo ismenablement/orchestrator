@@ -41,8 +41,18 @@ jobs:
   step3-final:
     needs: matrix-test
     runs-on: ubuntu-latest
+    if: always()
     steps:
     - name: Step 3 - Final Processing
       run: |
         echo "All matrix jobs completed. Performing final processing..."
         echo "Pipeline finished."
+
+  step4-post:
+    needs: step3-final
+    runs-on: ubuntu-latest
+    steps:
+    - name: Step 4 - Post Processing
+      run: |
+        echo "Step 4: Performing post-processing after final step..."
+        echo "All done."
