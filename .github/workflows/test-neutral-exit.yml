@@ -1,0 +1,29 @@
+name: Test Neutral Exit
+
+on:
+  workflow_dispatch:
+    inputs:
+      error_value:
+        description: 'Simulate error count (0 for success, 1 for errors)'
+        required: true
+        type: choice
+        options:
+        - '0'
+        - '1'
+
+jobs:
+  test-exit:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Simulate error handling
+      run: |
+        error_count=${{ inputs.error_value }}
+        echo "Simulated error count: $error_count"
+        
+        # If any errors were detected, exit with 78 to set job conclusion to neutral (warning-like status)
+        if [ $error_count -gt 0 ]; then
+          echo "Exiting with neutral status due to $error_count test error(s)."
+          exit 78
+        fi
+        
+        echo "No errors detected, continuing with success."
