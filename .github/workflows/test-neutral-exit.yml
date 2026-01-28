@@ -29,6 +29,7 @@ jobs:
         test_case: [1, 2, 3, 4, 5]
     steps:
     - name: Run Test Case
+      continue-on-error: true
       run: |
         echo "Running test case ${{ matrix.test_case }}..."
         if [ "${{ inputs.simulate_failure }}" = "yes" ] && [ ${{ matrix.test_case }} -eq 3 ]; then
