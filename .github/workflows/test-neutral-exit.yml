@@ -51,6 +51,7 @@ jobs:
   step4-post:
     needs: step3-final
     runs-on: ubuntu-latest
+    if: always()
     steps:
     - name: Step 4 - Post Processing
       run: |
